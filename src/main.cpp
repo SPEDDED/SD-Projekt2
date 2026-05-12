@@ -3,117 +3,153 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <iomanip>
 #include "Heap.h"
 #include "DataGenerator.h"
 #include "Array.h"
 
 using namespace std;
 
-// struktura do przechowywania uśrednionych wyników
+// Rozbudowana struktura do przechowywania wyników obu struktur
 struct TestResult {
     int size;
-    double avgInsertTime;
-    double avgExtractMaxTime;
+    double avgInsertHeap;
+    double avgExtractHeap;
+    double avgInsertArray;
+    double avgExtractArray;
 };
 
-// Wczytanie danych do tablicy przed pmiarem
 Node* loadDataFromFile(const string& filename, int& count) {
     ifstream inFile(filename);
     if (!inFile.is_open()) return nullptr;
 
-    inFile >> count;
-    Node* dataArray = new Node[count];
-    for (int i = 0; i < count; ++i) {
+    inFile>> count;
+    Node* dataArray =new Node[count];
+    for (int i= 0; i < count;++i) {
         inFile >> dataArray[i].priority >> dataArray[i].value;
     }
+
+
     inFile.close();
     return dataArray;
 }
 
 void runFullResearch() {
-    // 8 punktów pomiarowych
-    vector<int> sizes = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000};
-    const int iterations = 100; // Minimum 100 powtórzeń dla przypadku średniego 
+    // Rozmiary tablic do testów
+    vector<int> sizes= {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000};
+    const int iterations= 100; // liczba prób
     vector<TestResult> finalResults;
 
-    cout << "Rozpoczynanie badan... Moze to potrwac kilka minut.\n";
+
+    cout << "Rozpoczynanie badan porownawczych\n";
+
 
     for (int size : sizes) {
-        double totalInsertTime = 0;
-        double totalExtractTime = 0;
+        double tInsHeap = 0, tExtHeap = 0;
+        double tInsArr = 0, tExtArr = 0;
+
 
         for (int i = 0; i < iterations; ++i) {
             string filename = "data/temp_test_data.txt";
-            // Generowanie nowej populacji danych z innym ziarnem dla kazdej proby
             DataGenerator::generateRandomData(size, i + 100, filename);
 
             int count = 0;
             Node* testData = loadDataFromFile(filename, count);
             if (!testData) continue;
 
+
+
+            // ---TESTY KOPIEC---
+
             MaxHeap heap;
+            auto s1 = chrono::high_resolution_clock::now();
+            for (int j = 0; j < count; ++j) heap.insert(testData[j].value, testData[j].priority);
+            auto e1 = chrono::high_resolution_clock::now();
+            tInsHeap += chrono::duration_cast<chrono::nanoseconds>(e1 - s1).count();
 
-            // --- Pomiar operacji INSERT ---
-            auto startIn = chrono::high_resolution_clock::now();
-            for (int j = 0; j < count; ++j) {
-                heap.insert(testData[j].value, testData[j].priority);
-            }
-            auto endIn = chrono::high_resolution_clock::now();
-            totalInsertTime += chrono::duration_cast<chrono::nanoseconds>(endIn - startIn).count();
+            auto s2 = chrono::high_resolution_clock::now();
+            for (int j = 0; j < count; ++j) heap.extractMax();
+            auto e2 = chrono::high_resolution_clock::now();
+            tExtHeap += chrono::duration_cast<chrono::nanoseconds>(e2 - s2).count();
 
-            // --- Pomiar operacji EXTRACT-MAX ---
-            auto startEx = chrono::high_resolution_clock::now();
-            for (int j = 0; j < count; ++j) {
-                heap.extractMax();
-            }
-            auto endEx = chrono::high_resolution_clock::now();
-            totalExtractTime += chrono::duration_cast<chrono::nanoseconds>(endEx - startEx).count();
+
+            // ---TESTY TABLICA---
+
+            ArrayQueue arrayQ;
+            auto s3 = chrono::high_resolution_clock::now();
+            for (int j = 0; j < count; ++j) arrayQ.insert(testData[j].value, testData[j].priority);
+            auto e3 = chrono::high_resolution_clock::now();
+            tInsArr += chrono::duration_cast<chrono::nanoseconds>(e3 - s3).count();
+
+            auto s4 = chrono::high_resolution_clock::now();
+            for (int j = 0; j < count; ++j) arrayQ.extractMax();
+            auto e4 = chrono::high_resolution_clock::now();
+            tExtArr += chrono::duration_cast<chrono::nanoseconds>(e4 - s4).count();
+
 
             delete[] testData;
         }
 
-        // Obliczanie sredniego czasu na pojedyncza operacje w nanosekundach
+
+
+        // uśrednione czasy w nanosekundach
         finalResults.push_back({
             size,
-            (totalInsertTime / iterations) / size,
-            (totalExtractTime / iterations) / size
+            (tInsHeap / iterations) / size,
+            (tExtHeap / iterations) / size,
+            (tInsArr / iterations) / size,
+            (tExtArr / iterations) / size
         });
 
-        cout << "Zakonczono pomiary dla rozmiaru: " << size << "\n";
+        cout << ">> Zakonczono pomiary dla n= " << size << "\n";
     }
 
-    // Zapisywanie wynikow w folderze data 
-    ofstream resFile("data/wyniki_kopiec.csv");
-    resFile << "Rozmiar_n;Sredni_Insert_ns;Sredni_ExtractMax_ns\n";
-    for (const auto& res : finalResults) {
-        resFile << res.size << ";" << res.avgInsertTime << ";" << res.avgExtractMaxTime << "\n";
+
+    ofstream resFile("data/wyniki_porownawcze.csv");     // Zapis do  pliku CSV
+    resFile << "n;Insert_Heap_ns;ExtractMax_Heap_ns;Insert_Array_ns;ExtractMax_Array_ns\n";
+    for (const auto& r : finalResults) {
+        resFile << r.size << ";" << r.avgInsertHeap << ";" << r.avgExtractHeap << ";" 
+                << r.avgInsertArray << ";" << r.avgExtractArray << "\n";
     }
     resFile.close();
 
-    cout << "\nBadania ukonczone! Wyniki zapisano w 'data/wyniki_kopiec.csv'.\n";
+
+    cout << "\nBadania ukonczone! Wyniki znajdziesz w 'data/wyniki_porownawcze.csv'.\n";
 }
 
 int main() {
-
     int choice;
     do {
-        cout << "\n--- MENU PROJEKTOWE ---\n";
-        cout << "1. Uruchom pelna procedure badawcza (8 rozmiarow x 10 prob)\n";
-        cout << "2. Testuj recznie Kopiec (dodaj/usun/wyswietl)\n";
+        cout << "\n--- PROJEKT SD: KOLEJKA PRIORYTETOWA ---\n";
+        cout << "1. Uruchom badania\n";
+        cout << "2. Test reczny Kopca\n";
+        cout << "3. Test reczny Tablicy\n";
         cout << "0. Wyjscie\n";
         cout << "Wybor: ";
         cin >> choice;
 
+
+
         if (choice == 1) {
             runFullResearch();
-        } else if (choice == 2) {
-            // Menu do testów ręcznych
-            MaxHeap h;
-            h.insert(10, 5); h.insert(20, 15); h.insert(5, 1);
-            h.display();
-            cout << "Extract Max: " << h.extractMax().priority << "\n";
-            h.display();
         }
+
+        else if (choice==2) {
+            MaxHeap h;
+            h.insert(100, 10); h.insert(200, 20); h.insert(50, 5);
+            h.display();
+            cout << "Wyciagnieto max (priorytet): " << h.extractMax().priority << "\n";
+            h.display();
+        } 
+
+        else if (choice==3) {
+            ArrayQueue a;
+            a.insert(100, 10); a.insert(200, 20); a.insert(50, 5);
+            a.display();
+            cout << "Wyciagnieto max (priorytet): " << a.extractMax().priority << "\n";
+            a.display();
+        }
+
     } while (choice != 0);
 
     return 0;

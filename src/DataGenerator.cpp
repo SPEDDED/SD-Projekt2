@@ -30,5 +30,5 @@ void DataGenerator::generateRandomData(int count, int seed, const string& filena
     }
 
     outFile.close();
-    cout << "[Generator] Utworzono plik: " << filename << " (" << count << " par)" << endl;
+    cout << "Utworzono plik: " << filename << " (" << count << " par)" << endl;
 }
