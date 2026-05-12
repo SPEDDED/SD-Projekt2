@@ -3,13 +3,15 @@
 #include <cstdlib>
 #include <iostream>
 
-void DataGenerator::generateRandomData(int count, int seed, const std::string& filename) {
+using namespace std;
+
+void DataGenerator::generateRandomData(int count, int seed, const string& filename) {
     // Użycie ziarna do zapewnienia powtarzalności badań
     srand(seed);
 
-    std::ofstream outFile(filename);
+    ofstream outFile(filename);
     if (!outFile.is_open()) {
-        std::cerr << "Blad: Nie mozna otworzyc pliku do zapisu: " << filename << std::endl;
+        cerr << "Blad: Nie mozna otworzyc pliku do zapisu: " << filename << endl;
         return;
     }
 
@@ -28,5 +30,5 @@ void DataGenerator::generateRandomData(int count, int seed, const std::string& f
     }
 
     outFile.close();
-    std::cout << "[Generator] Utworzono plik: " << filename << " (" << count << " par)" << std::endl;
+    cout << "[Generator] Utworzono plik: " << filename << " (" << count << " par)" << endl;
 }
