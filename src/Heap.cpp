@@ -1,4 +1,6 @@
 #include "Heap.h"
+ 
+using namespace std;
 
 MaxHeap::MaxHeap() {
     capacity = 10;// Początkowa pojemność
@@ -106,9 +108,9 @@ int MaxHeap::returnSize() {
 }
 
 void MaxHeap::display() {
-    std::cout << "Kopiec (rozmiar: " << size << "):" << std::endl;
+    cout << "Kopiec (rozmiar: " << size << "):" << endl;
     for (int i = 0; i < size; i++) {
-        std::cout << "[" << i << "] Priorytet: " << data[i].priority 
-                  << ", Wartosc: " << data[i].value << std::endl;
+        cout << "[" << i << "] Priorytet: " << data[i].priority 
+                  << ", Wartosc: " << data[i].value << endl;
     }
 }
