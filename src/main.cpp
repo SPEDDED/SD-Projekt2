@@ -164,7 +164,7 @@ void runFullResearch() {
                 << r.aIns << ";" << r.aExt << ";" << r.aPeek << ";" << r.aMod << ";" << r.aSize << "\n";
     }
     resFile.close();
-    std::cout << "Wyniki zapisano w 'data/wyniki_pelne.csv'. Pamietaj o jednostkach [ns] w sprawozdaniu! [cite: 868]\n";
+    std::cout << "Wyniki zapisano w 'data/wyniki_pelne.csv'\n";
 }
 
 int main() {
