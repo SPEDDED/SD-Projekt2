@@ -5,6 +5,9 @@
 #include <vector>
 #include "Heap.h"
 #include "DataGenerator.h"
+#include "Array.h"
+
+using namespace std;
 
 // struktura do przechowywania uśrednionych wyników
 struct TestResult {
@@ -14,8 +17,8 @@ struct TestResult {
 };
 
 // Wczytanie danych do tablicy przed pmiarem
-Node* loadDataFromFile(const std::string& filename, int& count) {
-    std::ifstream inFile(filename);
+Node* loadDataFromFile(const string& filename, int& count) {
+    ifstream inFile(filename);
     if (!inFile.is_open()) return nullptr;
 
     inFile >> count;
@@ -29,18 +32,18 @@ Node* loadDataFromFile(const std::string& filename, int& count) {
 
 void runFullResearch() {
     // 8 punktów pomiarowych
-    std::vector<int> sizes = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000};
-    const int iterations = 10; // Minimum 10 powtórzeń dla przypadku średniego 
-    std::vector<TestResult> finalResults;
+    vector<int> sizes = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000};
+    const int iterations = 100; // Minimum 100 powtórzeń dla przypadku średniego 
+    vector<TestResult> finalResults;
 
-    std::cout << "Rozpoczynanie badan... Moze to potrwac kilka minut.\n";
+    cout << "Rozpoczynanie badan... Moze to potrwac kilka minut.\n";
 
     for (int size : sizes) {
         double totalInsertTime = 0;
         double totalExtractTime = 0;
 
         for (int i = 0; i < iterations; ++i) {
-            std::string filename = "data/temp_test_data.txt";
+            string filename = "data/temp_test_data.txt";
             // Generowanie nowej populacji danych z innym ziarnem dla kazdej proby
             DataGenerator::generateRandomData(size, i + 100, filename);
 
@@ -51,20 +54,20 @@ void runFullResearch() {
             MaxHeap heap;
 
             // --- Pomiar operacji INSERT ---
-            auto startIn = std::chrono::high_resolution_clock::now();
+            auto startIn = chrono::high_resolution_clock::now();
             for (int j = 0; j < count; ++j) {
                 heap.insert(testData[j].value, testData[j].priority);
             }
-            auto endIn = std::chrono::high_resolution_clock::now();
-            totalInsertTime += std::chrono::duration_cast<std::chrono::nanoseconds>(endIn - startIn).count();
+            auto endIn = chrono::high_resolution_clock::now();
+            totalInsertTime += chrono::duration_cast<chrono::nanoseconds>(endIn - startIn).count();
 
             // --- Pomiar operacji EXTRACT-MAX ---
-            auto startEx = std::chrono::high_resolution_clock::now();
+            auto startEx = chrono::high_resolution_clock::now();
             for (int j = 0; j < count; ++j) {
                 heap.extractMax();
             }
-            auto endEx = std::chrono::high_resolution_clock::now();
-            totalExtractTime += std::chrono::duration_cast<std::chrono::nanoseconds>(endEx - startEx).count();
+            auto endEx = chrono::high_resolution_clock::now();
+            totalExtractTime += chrono::duration_cast<chrono::nanoseconds>(endEx - startEx).count();
 
             delete[] testData;
         }
@@ -76,30 +79,30 @@ void runFullResearch() {
             (totalExtractTime / iterations) / size
         });
 
-        std::cout << "Zakonczono pomiary dla rozmiaru: " << size << "\n";
+        cout << "Zakonczono pomiary dla rozmiaru: " << size << "\n";
     }
 
     // Zapisywanie wynikow w folderze data 
-    std::ofstream resFile("data/wyniki_kopiec.csv");
+    ofstream resFile("data/wyniki_kopiec.csv");
     resFile << "Rozmiar_n;Sredni_Insert_ns;Sredni_ExtractMax_ns\n";
     for (const auto& res : finalResults) {
         resFile << res.size << ";" << res.avgInsertTime << ";" << res.avgExtractMaxTime << "\n";
     }
     resFile.close();
 
-    std::cout << "\nBadania ukonczone! Wyniki zapisano w 'data/wyniki_kopiec.csv'.\n";
+    cout << "\nBadania ukonczone! Wyniki zapisano w 'data/wyniki_kopiec.csv'.\n";
 }
 
 int main() {
 
     int choice;
     do {
-        std::cout << "\n--- MENU PROJEKTOWE ---\n";
-        std::cout << "1. Uruchom pelna procedure badawcza (8 rozmiarow x 10 prob)\n";
-        std::cout << "2. Testuj recznie Kopiec (dodaj/usun/wyswietl)\n";
-        std::cout << "0. Wyjscie\n";
-        std::cout << "Wybor: ";
-        std::cin >> choice;
+        cout << "\n--- MENU PROJEKTOWE ---\n";
+        cout << "1. Uruchom pelna procedure badawcza (8 rozmiarow x 10 prob)\n";
+        cout << "2. Testuj recznie Kopiec (dodaj/usun/wyswietl)\n";
+        cout << "0. Wyjscie\n";
+        cout << "Wybor: ";
+        cin >> choice;
 
         if (choice == 1) {
             runFullResearch();
@@ -108,7 +111,7 @@ int main() {
             MaxHeap h;
             h.insert(10, 5); h.insert(20, 15); h.insert(5, 1);
             h.display();
-            std::cout << "Extract Max: " << h.extractMax().priority << "\n";
+            cout << "Extract Max: " << h.extractMax().priority << "\n";
             h.display();
         }
     } while (choice != 0);
