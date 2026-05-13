@@ -43,8 +43,6 @@ Node ArrayQueue::extractMax() {
     }
 
     Node maxNode = data[maxIdx];
-
-    // Usuwamy element poprzez przesunięcie ostatniego w jego miejsce - O(1)
     data[maxIdx] = data[size - 1];
     size--;
 
