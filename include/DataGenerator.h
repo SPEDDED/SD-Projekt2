@@ -3,7 +3,6 @@
 
 #include <string>
 
-    // Generowanie pliku tekstowego z parami: priorytet i wartość (int)
 class DataGenerator {
 public:
 
