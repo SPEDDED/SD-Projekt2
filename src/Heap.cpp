@@ -5,15 +5,15 @@ using namespace std;
 MaxHeap::MaxHeap() {
     capacity = 10;// Początkowa pojemność
     size = 0;
-    data = new Node[capacity]; // Dynamiczna alokacja
+    data = new Node[capacity]; // Dynamiczna alokacja pamięci dla elementów kopca
 }
 
 MaxHeap::~MaxHeap() {
-    delete[] data; // Zwolnienie pamięci
+    delete[] data; 
 }
 
 void MaxHeap::resize() {
-    capacity *= 2; // Podwojenie rozmiaru
+    capacity *= 2; 
     Node* newData = new Node[capacity];
     for (int i = 0; i < size; i++) {
         newData[i] = data[i];
@@ -87,18 +87,13 @@ Node MaxHeap::findMax() {
 }
 
 void MaxHeap::modifyKey(int value, int newPriority) {
-    // W kopcu wyszukiwanie wartości 'e' zajmuje O(n) 
     for (int i = 0; i < size; i++) {
         if (data[i].value == value) {
             int oldPriority = data[i].priority;
             data[i].priority = newPriority;
-            
-            if (newPriority > oldPriority) {
-                heapifyUp(i);
-            } else {
-                heapifyDown(i);
-            }
-            return;
+            if (newPriority > oldPriority) heapifyUp(i);
+            else heapifyDown(i);
+            return; 
         }
     }
 }
