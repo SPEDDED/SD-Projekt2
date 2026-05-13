@@ -1,7 +1,7 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
-#include "Heap.h" // Używamy tej samej struktury Node
+#include "Heap.h"
 
 class ArrayQueue {
 private:
