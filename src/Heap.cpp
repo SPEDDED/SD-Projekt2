@@ -5,7 +5,7 @@ using namespace std;
 MaxHeap::MaxHeap() {
     capacity = 10;// Początkowa pojemność
     size = 0;
-    data = new Node[capacity]; // Dynamiczna alokacja pamięci dla elementów kopca
+    data = new Node[capacity]; // Dynamiczna alokacja
 }
 
 MaxHeap::~MaxHeap() {
@@ -13,21 +13,21 @@ MaxHeap::~MaxHeap() {
 }
 
 void MaxHeap::resize() {
-    capacity *= 2; 
-    Node* newData = new Node[capacity];
+    capacity *= 2; // Podwojenie pojemności
+    Node* newData = new Node[capacity]; // Stworzenie nowej tablicy o większej pojemności
     for (int i = 0; i < size; i++) {
-        newData[i] = data[i];
+        newData[i] = data[i]; // Kopiowanie danych
     }
-    delete[] data;
+    delete[] data; //destruktor
     data = newData;
 }
 
 void MaxHeap::heapifyUp(int index) {
     while (index > 0) {
         int parent = (index - 1) / 2;
-        if (data[index].priority > data[parent].priority) {
-            // Zamiana (swap)
-            Node temp = data[index];
+        if (data[index].priority > data[parent].priority) { //zmiana jeśli priorytet jest większy niż rodzica
+
+            Node temp = data[index]; 
             data[index] = data[parent];
             data[parent] = temp;
             index = parent;
@@ -38,19 +38,19 @@ void MaxHeap::heapifyUp(int index) {
 }
 
 void MaxHeap::heapifyDown(int index) {
-    while (true) {
-        int left = 2 * index + 1;
-        int right = 2 * index + 2;
-        int largest = index;
+    while (true) { 
+        int left = 2 * index + 1; //lewe dziecko
+        int right = 2 * index + 2; //prawe dziecko
+        int largest = index; 
 
-        if (left < size && data[left].priority > data[largest].priority) {
+        if (left < size && data[left].priority > data[largest].priority) { 
             largest = left;
         }
         if (right < size && data[right].priority > data[largest].priority) {
             largest = right;
         }
 
-        if (largest != index) {
+        if (largest != index) {//zmiana jeśli dziecko ma większy priorytet
             Node temp = data[index];
             data[index] = data[largest];
             data[largest] = temp;
@@ -62,7 +62,8 @@ void MaxHeap::heapifyDown(int index) {
 }
 
 void MaxHeap::insert(int value, int priority) {
-    if (size == capacity) {
+    if (size == capacity) { //Zwiększzenie rozmariu jak tablica jest zapełniona
+
         resize();
     }
     data[size].value = value;
@@ -72,26 +73,26 @@ void MaxHeap::insert(int value, int priority) {
 }
 
 Node MaxHeap::extractMax() {
-    if (size <= 0) return {-1, -1};
+    if (size <= 0) return {-1, -1}; //Dla pustego kopca zwrócenie braku elementu
     
     Node maxNode = data[0];
     data[0] = data[size - 1];
     size--;
     heapifyDown(0);
-    return maxNode;
+    return maxNode; 
 }
 
 Node MaxHeap::findMax() {
-    if (size <= 0) return {-1, -1};
+    if (size <= 0) return {-1, -1}; //Dla pustego kopca zwrócenie braku elementu
     return data[0];
 }
 
-void MaxHeap::modifyKey(int value, int newPriority) {
+void MaxHeap::modifyKey(int value, int newPriority) { 
     for (int i = 0; i < size; i++) {
         if (data[i].value == value) {
-            int oldPriority = data[i].priority;
-            data[i].priority = newPriority;
-            if (newPriority > oldPriority) heapifyUp(i);
+            int oldPriority = data[i].priority; // zapisanie starego priorytetu
+            data[i].priority = newPriority;// nowy priorytet
+            if (newPriority > oldPriority) heapifyUp(i); // jeśli nowy priorytet jest większy to wywołanie heapifyUp, inaczej dfheapifyDown
             else heapifyDown(i);
             return; 
         }
